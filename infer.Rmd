@@ -1,0 +1,774 @@
+---
+title: "Getting to Know infer"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    df_print: default
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+# Check if learnr and gradethis are installed  
+if (!requireNamespace("learnr", quietly = TRUE)) {
+  stop(c("The \"learnr\" package is needed for this lesson. The package ",
+         "can be installed using \"install.packages(\"learnr\")\""),
+       call. = FALSE)
+}
+if (!requireNamespace("gradethis", quietly = TRUE)) {
+  stop(c("The \"gradethis\" package is needed for this lesson. The package ",
+         "can be installed using",
+         "\"remotes::install_github(\"rstudio-education/gradethis\")\""),
+       call. = FALSE)
+}
+
+library(learnr)
+library(gradethis)
+devtools::load_all()
+tutorial_options(exercise.timelimit = 60,
+                 exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(rows.print=5)
+```
+
+## Welcome
+
+In this tutorial, you will learn how to use the `infer` R package to conduct hypothesis tests on tidy data. Rather than providing methods for specific statistical tests, this package consolidates the principles that are shared among common hypothesis tests into a set of 4 main verbs (functions), supplemented with many utilities to visualize and extract value from their outputs.
+
+This tutorial assumes some background with hypothesis testing and base R. To read about the intuition behind hypothesis testing and the design of this package, see the *Introduction* section of `vignette("infer")`.
+
+### The `gss` Dataset
+
+Throughout this tutorial, we'll make use of the `gss` dataset supplied by `infer`, containing a sample of 3000 observations of 11 variables from the *General Social Survey*. Print the `gss` dataset to check it out!
+
+```{r gss, exercise = TRUE}
+# check out the `gss` dataset
+```
+
+
+```{r gss-hint-1}
+# Type `gss` and then click the Submit Answer button.
+```
+
+```{r gss-solution}
+gss
+```
+
+```{r gss-check}
+gradethis::grade_code(paste0(gradethis::random_praise(),
+                        " Each of these rows is a survey response, containing",
+                        " demographic information on the respondent as well",
+                        " as some of their responses. See ?gss for more",
+                        " information!"))
+```
+
+
+## The 4 Main Verbs
+
+The workflow of this package is designed around four main verbs. Starting out with some dataset,
+
++ `specify()` allows you to specify the variable, or relationship between variables, that you're interested in.
++ `hypothesize()` allows you to declare the null hypothesis.
++ `generate()` allows you to generate data reflecting the null hypothesis.
++ `calculate()` allows you to calculate a distribution of statistics from the generated data to form the null distribution.
+
+
+## Specify
+
+The `specify` function can be used to specify which of the variable(s) in the dataset you're interested in. If you're only interested in, say, the `age` of the respondents, you might write:
+
+```{r specify_example, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = age)
+```
+
+On the front-end, the output of `specify` just looks like it selects off the columns in the dataframe that you've specified. Checking the class of this object, though:
+
+```{r specify-one, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = age) %>%
+  class()
+```
+
+We can see that the `infer` class has been appended on top of the dataframe classes--this new class stores some extra metadata.
+
+### Exercise
+
+Let's try this out. Use `specify()` to specify interest in the `hours` variable from the `gss` dataset.
+
+```{r specify, exercise = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+```{r specify-hint-1}
+# Try piping `gss` into `specify(response = hours)` 
+# and then clicking the Submit Answer button.
+```
+
+```{r specify-hint-2}
+# Type `gss %>% specify(response = hours)` 
+# and then click the Submit Answer button.
+```
+
+
+```{r specify-solution}
+gss %>% specify(response = hours)
+```
+
+```{r specify-check}
+gradethis::grade_code(paste0(gradethis::random_praise()))
+```
+
+
+### specify() Two Variables
+
+If you're interested in two variables--`age` and `partyid`, for example--you can `specify` their relationship in one of two (equivalent) ways:
+
+```{r specify-two-example, eval = FALSE}
+# as a formula
+gss %>%
+  specify(age ~ partyid)
+
+# with the named arguments
+gss %>%
+  specify(response = age, explanatory = partyid)
+```
+
+Let's give this a shot, specifying interest in `hours` as a function of `college` with whichever syntax you prefer.
+
+```{r specify-two, exercise = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+```{r specify-two-hint-1}
+# Try piping `gss` into `specify(response = hours, explanatory = college)` 
+# and then clicking the Submit Answer button.
+```
+
+```{r specify-two-hint-2, eval = FALSE}
+# Type `gss %>% specify(response = hours, explanatory = college)` 
+# and then click the Submit Answer button.
+```
+
+```{r specify-two-check}
+gradethis::grade_result(
+  gradethis::pass_if(~ identical(.result, gss %>% 
+                                   specify(response = hours, 
+                                           explanatory = college)),
+          gradethis::random_praise()))
+```
+
+### specify() With Proportions
+
+If you're doing inference on one proportion or a difference in proportions, you will need to use the `success` argument to specify which level of your `response` variable is a success. For instance, if you're interested in the proportion of the population with a college degree, you might use the following code:
+
+```{r specify-success, eval = FALSE}
+# specifying for inference on proportions
+gss %>%
+  specify(response = college, success = "degree")
+```
+
+## Hypothesize
+
+The next step in the `infer` pipeline is often to declare a null hypothesis using `hypothesize()`. The first step is to supply one of `"independence"` or `"point"` to the `null` argument. If your null hypothesis assumes independence between two variables, then this is all you need to supply to `hypothesize()`:
+
+```{r hypothesize-independence-example, eval = FALSE}
+gss %>%
+  specify(age ~ partyid) %>%
+  hypothesize(null = "independence")
+```
+
+Again, if we ran this code,  the dataframe outputted from `hypothesize()` would look almost exactly the same as it did when it came out of `specify()`, but `infer` now "knows" your null hypothesis.
+
+### Exercise
+
+Starting off from the code we used to `specify()` the `hours` and `college`, `hypothesize()` that these two variables are independent of each other.
+
+```{r hypothesize-two, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>% 
+  specify(response = hours, explanatory = college)
+```
+
+```{r hypothesize-two-hint-1}
+# Try piping the provided code into `hypothesize(null = \"independence\")` 
+# and then clicking the Submit Answer button."
+```
+
+```{r hypothesize-two-hint-2, eval = FALSE}
+# Type: 
+gss %>% 
+  specify(response = hours, explanatory = college)
+  hypothesize(null = "independence")
+# and then click the Submit Answer button.
+```
+
+```{r hypothesize-two-check}
+gradethis::grade_result(
+  gradethis::pass_if(~ identical(.result, gss %>% 
+                          specify(response = hours,
+                                  explanatory = college) %>%
+                          hypothesize("independence")),
+          gradethis::random_praise()))
+```
+
+### Inference with Point Estimates
+
+If you're doing inference on a point estimate, you will also need to provide one of `p` (the true proportion of successes, between 0 and 1), `mu` (the true mean), `med` (the true median), or `sigma` (the true standard deviation). For instance, if the null hypothesis is that the mean number of hours Americans work per week is 40, we would write:
+
+```{r hypothesize-40-hr-week, eval = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40)
+```
+
+Alter the code from above to hypothesize that the true standard deviation of hours worked per week is 10.
+
+```{r hypothesize-one, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40)
+```
+
+```{r hypothesize-one-hint-1}
+# The argument to put in place of `mu` is `sigma`.
+```
+
+```{r hypothesize-one-hint-2, eval = FALSE}
+# Type:
+gss %>% 
+  specify(response = hours) %>%
+  hypothesize(null = "point", sigma = 10)
+# and then click the Submit Answer button.
+```
+
+```{r hypothesize-one-check}
+gradethis::grade_result(
+  gradethis::pass_if(~ identical(.result, gss %>%
+                           specify(response = hours) %>%
+                           hypothesize(null = "point", sigma = 10)),
+          gradethis::random_praise()))
+```
+
+
+## Generate
+
+Once we've asserted our null hypothesis using `hypothesize()`, we can construct a reference distribution based on this hypothesis. We can do this using one of several methods, supplied in the `type` argument:
+
+* `bootstrap`: A bootstrap sample will be drawn for each replicate, where a sample of size equal to the input sample size is drawn (with replacement) from the input sample data.  
+* `permute`: For each replicate, each input value will be randomly reassigned (without replacement) to a new output value in the sample.  
+* `simulate`: A value will be sampled from a theoretical distribution with parameters specified in `hypothesize()` for each replicate. (This option is currently only applicable for testing point estimates.) 
+
+Continuing on with our example from earlier, about the average number of hours worked a week, we might write:
+
+```{r generate-point-example, eval = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40) %>%
+  generate(reps = 1000, type = "bootstrap")
+```
+
+In the above example, we take 1000 bootstrap samples to form our reference distribution for the true mean number of hours worked per week. Modify the code below to generate a reference distribution for the true **median** number of hours worked per week from **500** repetitions drawn using the `bootstrap` generation type.
+
+```{r generate-point, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40) %>%
+  generate(reps = 1000, type = "bootstrap")
+```
+
+```{r generate-point-hint-1}
+# The argument to put in place of `mu` is `med`.
+```
+
+```{r generate-point-hint-2, eval = FALSE}
+# Type: 
+gss %>% 
+  specify(response = hours) %>%
+  hypothesize(null = "point", med = 40) %>%
+  generate(reps = 500, type = "bootstrap")
+# and then click the Submit Answer button.
+```
+
+```{r generate-point-solution}
+gss %>% 
+  specify(response = hours) %>%
+  hypothesize(null = "point", med = 40) %>%
+  generate(reps = 500, type = "bootstrap")
+```
+
+```{r generate-point-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise(),
+    " A smaller `reps` argument usually means that the code will run much",
+    " faster, but also that the resulting reference distribution (and ",
+    " inferences made from it) will be less accurate."))
+```
+
+### generate() with Two Variables
+
+To generate a null distribution for the independence of two variables, imagine randomly reshuffling the pairings of explanatory and response variables to break any existing association. Extend the following code to generate **500** replicates using the "permute" generation type that can be used to create a reference distribution under the assumption that political party affiliation (`partyid`) is not affected by age (`age`):
+
+
+```{r generate-permute, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(partyid ~ age) %>%
+  hypothesize(null = "independence")
+```
+
+```{r generate-permute-hint-1}
+# Pipe the given code into a `generate()` call!
+```
+
+```{r generate-permute-hint-2, eval = FALSE}
+# Type: 
+gss %>%
+  specify(partyid ~ age) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute")
+# and then click the Submit Answer button.
+```
+
+```{r generate-permute-solution}
+gss %>%
+  specify(partyid ~ age) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 500, type = "permute")
+```
+
+```{r generate-permute-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise(),
+    " That's it for generate()."))
+```
+
+## Calculate
+
+Depending on whether you're carrying out computation-based inference or theory-based inference, you will either supply `calculate()` with the output of `generate()` or `hypothesize`, respectively. The function also takes in a `stat` argument, which is currently one of "mean", "median", "sum", "sd", "prop", "count", "diff in means", "diff in medians", "diff in props", "Chisq", "F", "t", "z", "slope", or "correlation". For example, continuing our example above to calculate the null distribution of mean hours worked per week:
+
+```{r calculate-point, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+```
+
+The output of `calculate()` here shows us the sample statistic (in this case, the mean) for each of our 1000 replicates. 
+
+### Exercise
+
+Let's give `calculate()` a try. Add to the following code to `calculate` the median of each bootstrap sample for the number of hours of worked per week.
+
+
+```{r calculate1, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", med = 40) %>%
+  generate(reps = 1000, type = "bootstrap")
+```
+
+```{r calculate1-hint-1}
+# Pipe the given code into a `calculate()` call!
+```
+
+```{r calculate1-hint-2, eval = FALSE}
+# Type: 
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", med = 40) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "median")
+# and then click the Submit Answer button.
+```
+
+```{r calculate1-solution}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", med = 40) %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "median")
+```
+
+```{r calculate1-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise(),
+    " Now let's try working with two variables."))
+```
+
+If you're carrying out inference on differences in means, medians, or proportions, or t and z statistics, you will need to supply an `order` argument, giving the order in which the explanatory variables should be subtracted. For instance, to find the difference in mean age of those that have a college degree and those that don't, we might write:
+
+```{r specify-diff-in-means, warning = FALSE, message = FALSE}
+gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate("diff in means", order = c("degree", "no degree"))
+```
+
+
+### Exercise
+
+Let's try using `calculate` with two variables. Add to the following code to `calculate` the difference in mean number of hours worked (`hours`) depending on whether one has a college degree or not (`college`)--subtract in the order `degree - no degree`.
+
+
+```{r calculate2, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(hours ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute")
+```
+
+```{r calculate2-hint-1}
+# Pipe the given code into a call to `calculate()`!
+```
+
+```{r calculate2-hint-2}
+# The argument to `stat` in `calculate` should be "diff in means"
+```
+
+```{r calculate2-hint-3}
+# The argument to `order` in `calculate` should be c("degree", "no degree")
+```
+
+```{r calculate2-hint-4}
+# Pipe the given code into 
+# calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+```{r calculate2-hint-5, eval = FALSE}
+# Type: 
+gss %>%
+  specify(hours ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+# and then click the Submit Answer button.
+```
+
+```{r calculate2-solution}
+gss %>%
+  specify(hours ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+```{r calculate2-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise()))
+```
+
+### calculate()ing Observed Statistics
+
+You can also use `calculate()` to calculate observed statistics from your data. For example, to calculate the mean number of hours worked per week by respondents in our data, we might write:
+
+```{r calculate-stat-example, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  calculate(stat = "mean")
+```
+
+Notice this looks almost exactly like the code to generate the reference distribution of mean number of hours worked from the earlier example, except we've skipped the `hypothesize()` and `generate()` steps.
+
+We can also calculate observed statistics that require a null hypothesis. For example, if we suspect that the true mean number of hours worked in the population is 40 hours, we could run the following code to find an observed $t$ statistic:
+
+```{r calculate-stat-example2, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40) %>%
+  calculate(stat = "t")
+```
+
+Building off of the following code, `calculate()` the proportion (`"prop"`) of respondents in the sample *with* a college degree.
+
+```{r calculate-stat, exercise = TRUE, warning = FALSE, message = FALSE}
+gss %>%
+  specify(response = college, success = "degree")
+```
+
+```{r calculate-stat-hint-1}
+# Pipe the given code into a `calculate()` call!
+```
+
+```{r calculate-stat-hint-2, eval = FALSE}
+# Type: 
+gss %>%
+  specify(response = college, success = "degree") %>%
+  calculate(stat = "prop")
+# and then click the Submit Answer button.
+```
+
+```{r calculate-stat-solution}
+gss %>%
+  specify(response = college, success = "degree") %>%
+  calculate(stat = "prop")
+```
+
+```{r calculate-stat-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise(),
+    "That's it for the 4 main verbs!"))
+```
+
+## Other Utilities
+
+`infer` also offers several utilities to extract the meaning out of summary statistics and null distributions---the package provides functions to visualize where a statistic is relative to a distribution (with `visualize()`), calculate p-values (with `get_p_value()`), and calculate confidence intervals (with `get_confidence_interval()`).
+
+### Setup
+
+To illustrate the usage of these different functions, we'll go back to the example of determining whether the true mean number of hours worked per week is 40 hours.
+
+```{r utilities-examples, warning = FALSE, message = FALSE}
+# find the point estimate
+point_estimate <- gss %>%
+  specify(response = hours) %>%
+  calculate(stat = "mean")
+
+point_estimate
+
+# generate a null distribution
+null_dist <- gss %>%
+  specify(response = hours) %>%
+  hypothesize(null = "point", mu = 40) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+```
+
+Our point estimate `r point_estimate` seems *pretty* close to 40, but a little bit different. We might wonder if this difference is just due to random chance, or if the mean number of hours worked per week in the population really isn't 40.
+
+### Visualizing
+
+
+We could initially just visualize the null distribution.
+
+```{r visualize-ex, warning = FALSE, message = FALSE}
+null_dist %>%
+  visualize()
+```
+
+Where does our sample's observed statistic lie on this distribution? We can use the `obs_stat` argument to specify this.
+
+```{r visualize2, warning = FALSE, message = FALSE}
+null_dist %>%
+  visualize() +
+  shade_p_value(obs_stat = point_estimate, direction = "two_sided")
+```
+
+Notice that `infer` has also shaded the regions of the null distribution that are as (or more) extreme than our observed statistic. (Also, note that we now use the `+` operator to apply the `shade_p_value` function. This is because `visualize` outputs a plot object from `ggplot2` instead of a data frame, and the `+` operator is needed to add the p-value layer to the plot object.) 
+
+### p-Values and Confidence Intervals
+
+The red bar from that last visualization looks like it's pretty far out on the right tail of the null distribution, so observing a sample mean of `r point_estimate` hours would be pretty unlikely if the mean was actually 40 hours. How unlikely, though?
+
+```{r get_p_value, warning = FALSE, message = FALSE}
+# get a two-tailed p-value
+p_value <- null_dist %>%
+  get_p_value(obs_stat = point_estimate, direction = "two_sided")
+
+p_value
+```
+
+It looks like the p-value is `r p_value`, which is pretty small---if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (`r abs(point_estimate-40)` hours) from 40 would be `r p_value`. This may or may not be statistically significantly different, depending on the significance level $\alpha$ you decided on *before* you ran this analysis. If you had set $\alpha = .05$, then this difference would be statistically significant, but if you had set $\alpha = .01$, then it would not be.
+
+To get a confidence interval around our estimate, we can write:
+
+```{r get_conf, message = FALSE, warning = FALSE}
+# start with the null distribution
+null_dist %>%
+  # calculate the confidence interval around the point estimate
+  get_confidence_interval(point_estimate = point_estimate,
+                          # at the 95% confidence level
+                          level = .95,
+                          # using the standard error
+                          type = "se")
+```
+
+As you can see, 40 hours per week is not contained in this interval, which aligns with our previous conclusion that this finding is significant at the confidence level $\alpha = .05$.
+
+### Exercise
+
+The following code calculates an observed $t$ statistic for the distribution 
+
+```{r, warning = FALSE, message = FALSE}
+observed_statistic <- gss %>%
+  specify(hours ~ college) %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+
+null_dist <- gss %>%
+  specify(hours ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+You have access to the `observed_statistic` and `null_dist` objects. Modify the following code to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two-sided"`.)
+
+```{r visualize, exercise = TRUE, warning = FALSE, message = FALSE}
+null_dist %>%
+  visualize()
+```
+
+```{r visualize-hint-1}
+# Pipe the given code into a `shade_p_value()` call!
+```
+
+```{r visualize-hint-2, eval = FALSE}
+# Type: 
+null_dist %>%
+  visualize() %>%
+  shade_p_value(obs_stat = observed_statistic, direction = "two_sided")
+# and then click the Submit Answer button.
+```
+
+```{r visualize-solution}
+null_dist %>%
+  visualize() %>%
+  shade_p_value(obs_stat = observed_statistic, direction = "two_sided")
+```
+
+```{r visualize-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise()))
+```
+
+## Challenge Problems
+
+### Calculating an Observed Difference
+
+Let's try to put together everything we've learned so far.
+
+To start off, use `gss` and functions from `infer` to find the observed difference in mean age (`age`) by college degree status (`college`), subtracted in the order `degree - no degree`.
+
+```{r ch1, exercise = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+```{r ch1-hint-1}
+# Use the specify() and calculate() functions!
+```
+
+```{r ch1-hint-2, eval = FALSE}
+# Here's the first two lines:
+gss %>%
+  specify(age ~ college)
+# See if you can write the last one!
+```
+
+```{r ch1-hint-3, eval = FALSE}
+# Type: 
+gss %>%
+  specify(age ~ college) %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+# and then click the Submit Answer button.
+```
+
+```{r ch1-check}
+gradethis::grade_result(
+  gradethis::pass_if(~ identical(.result, gss %>%
+    specify(age ~ college) %>%
+    calculate(stat = "diff in means", order = c("degree", "no degree"))),
+                     gradethis::random_praise()))
+```
+
+### Generate a Null Distribution
+
+```{r ch-setup, include = FALSE}
+observed_diff <- gss %>%
+  specify(age ~ college) %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+
+null_dist <- gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+You have access to the observed difference you calculated in the last problem, stored as `observed_diff`. Now, use `gss` and functions from `infer` to find a null distribution for the difference in mean age (`age`) by college degree status (`college`), again subtracting in the order `degree - no degree`, using 1000 permutation samples. Use the formula (`y ~ x`) notation in your call to `specify()`.
+
+
+```{r ch-null, exercise = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+```{r ch-null-hint-1}
+# Use all of the 4 main verbs!
+```
+
+```{r ch-null-hint-2, eval = FALSE}
+# Here's the first two lines:
+gss %>%
+  specify(age ~ college)
+# See if you can write the next three!
+```
+
+```{r ch-null-hint-3, eval = FALSE}
+# Here's the first three lines:
+gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence")
+# See if you can write the last two!
+```
+
+```{r ch-null-hint-4, eval = FALSE}
+# Type: 
+gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+# and then click the Submit Answer button.
+```
+
+```{r ch-null-solution, warning = FALSE, message = FALSE}
+gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+```{r ch-null-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise()))
+```
+
+### Generate a Null Distribution
+
+You have access to the observed difference and null distribution you calculated in the last problems, stored as `observed_diff` and `null_dist`. Now, use `gss` and functions from `infer` to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two-sided"`.)
+
+
+```{r ch-viz, exercise = TRUE, warning = FALSE, message = FALSE}
+
+```
+
+```{r ch-viz-hint-1}
+# Use visualize() and shade_p_value!
+```
+
+```{r ch-viz-hint-2, eval = FALSE}
+# Have you made sure to add the shade_p_value() layer with
+# `+` rather than piping the visualize() layer with `%>%`?
+```
+
+```{r ch-viz-hint-3, eval = FALSE}
+# Here's the first two lines
+null_dist %>%
+  visualize()
+# See if you can write the last one!
+```
+
+```{r ch-viz-hint-4, eval = FALSE}
+# Type: 
+null_dist %>%
+  visualize() +
+  shade_p_value(obs_stat = observed_diff, direction = "two_sided")
+# and then click the Submit Answer button.
+```
+
+```{r ch-viz-solution, warning = FALSE, message = FALSE}
+null_dist %>%
+  visualize() +
+  shade_p_value(obs_stat = observed_diff, direction = "two_sided")
+```
+
+```{r ch-viz-check}
+gradethis::grade_code(correct = paste0(gradethis::random_praise(),
+    " That's it! You've got `infer` down. Congrats on making it all of the",
+    " way through this tutorial! Many of the examples provided",
+    " in this tutorial are included in the main `infer` vignette,",
+    " accessible by calling vignette(\"infer\") in your console."))
+```
+
