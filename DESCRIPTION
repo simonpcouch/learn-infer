@@ -1,0 +1,18 @@
+Package: learn-infer
+Type: Tutorial
+Title: Learn infer
+Version: 0.0.1.9000
+Authors@R: c(person("Simon P.", "Couch", , 
+             "simonpatrickcouch@gmail.com", c("aut", "cre")))
+Description: A learnr tutorial for infer, an R package for performing 
+    statistical inference using an expressive statistical grammar that 
+    coheres with the tidyverse design framework.
+License: CC0
+Imports:
+    infer
+Remotes:
+    rstudio-education/gradethis
+Encoding: UTF-8
+LazyData: true
+URL: https://github.com/simonpcouch/learn-infer
+BugReports: https://github.com/simonpcouch/learn-infer/issues

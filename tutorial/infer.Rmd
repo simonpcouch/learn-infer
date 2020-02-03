@@ -24,7 +24,7 @@ if (!requireNamespace("gradethis", quietly = TRUE)) {
 
 library(learnr)
 library(gradethis)
-devtools::load_all()
+library(infer)
 tutorial_options(exercise.timelimit = 60,
                  exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(rows.print=5)

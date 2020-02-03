@@ -158,20 +158,20 @@ $(document).ready(function () {
 <pre class="r"><code>gss %&gt;%
   specify(response = age)</code></pre>
 <pre><code>## Response: age (numeric)
-## # A tibble: 2,988 x 1
+## # A tibble: 500 x 1
 ##      age
 ##    &lt;dbl&gt;
-##  1    37
-##  2    29
-##  3    58
-##  4    40
-##  5    39
-##  6    37
-##  7    53
-##  8    41
-##  9    55
-## 10    47
-## # … with 2,978 more rows</code></pre>
+##  1    36
+##  2    34
+##  3    24
+##  4    42
+##  5    31
+##  6    32
+##  7    48
+##  8    36
+##  9    30
+## 10    33
+## # … with 490 more rows</code></pre>
 <p>On the front-end, the output of <code>specify</code> just looks like it selects off the columns in the dataframe that you’ve specified. Checking the class of this object, though:</p>
 <pre class="r"><code>gss %&gt;%
   specify(response = age) %&gt;%
@@ -393,16 +393,16 @@ gss %&gt;%
 <pre><code>## # A tibble: 1,000 x 2
 ##    replicate  stat
 ##        &lt;int&gt; &lt;dbl&gt;
-##  1         1  39.9
-##  2         2  40.0
+##  1         1  39.8
+##  2         2  40.6
 ##  3         3  39.8
-##  4         4  40.0
+##  4         4  40.1
 ##  5         5  39.7
-##  6         6  39.3
-##  7         7  40.1
-##  8         8  40.2
-##  9         9  40.0
-## 10        10  40.4
+##  6         6  40.4
+##  7         7  39.6
+##  8         8  40.4
+##  9         9  39.6
+## 10        10  39.1
 ## # … with 990 more rows</code></pre>
 <p>The output of <code>calculate()</code> here shows us the sample statistic (in this case, the mean) for each of our 1000 replicates.</p>
 <div id="section-exercise-2" class="section level3">
@@ -445,18 +445,18 @@ gss %&gt;%
   generate(reps = 1000, type = &quot;permute&quot;) %&gt;%
   calculate(&quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))</code></pre>
 <pre><code>## # A tibble: 1,000 x 2
-##    replicate   stat
-##        &lt;int&gt;  &lt;dbl&gt;
-##  1         1 -0.632
-##  2         2  0.664
-##  3         3 -1.46 
-##  4         4  0.540
-##  5         5  1.16 
-##  6         6  0.272
-##  7         7  0.695
-##  8         8 -1.15 
-##  9         9 -0.659
-## 10        10  0.870
+##    replicate    stat
+##        &lt;int&gt;   &lt;dbl&gt;
+##  1         1  2.08  
+##  2         2 -1.69  
+##  3         3 -0.0113
+##  4         4  0.368 
+##  5         5  1.80  
+##  6         6 -3.14  
+##  7         7 -0.531 
+##  8         8 -2.05  
+##  9         9 -2.53  
+## 10        10 -1.37  
 ## # … with 990 more rows</code></pre>
 </div>
 <div id="section-exercise-3" class="section level3">
@@ -511,7 +511,7 @@ gss %&gt;%
 <pre><code>## # A tibble: 1 x 1
 ##    stat
 ##   &lt;dbl&gt;
-## 1  40.8</code></pre>
+## 1  41.4</code></pre>
 <p>Notice this looks almost exactly like the code to generate the reference distribution of mean number of hours worked from the earlier example, except we’ve skipped the <code>hypothesize()</code> and <code>generate()</code> steps.</p>
 <p>We can also calculate observed statistics that require a null hypothesis. For example, if we suspect that the true mean number of hours worked in the population is 40 hours, we could run the following code to find an observed <span class="math inline">\(t\)</span> statistic:</p>
 <pre class="r"><code>gss %&gt;%
@@ -521,7 +521,7 @@ gss %&gt;%
 <pre><code>## # A tibble: 1 x 1
 ##    stat
 ##   &lt;dbl&gt;
-## 1  2.31</code></pre>
+## 1  2.09</code></pre>
 <p>Building off of the following code, <code>calculate()</code> the proportion (<code>&quot;prop&quot;</code>) of respondents in the sample <em>with</em> a college degree.</p>
 <div class="tutorial-exercise" data-label="calculate-stat" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>gss %&gt;%
@@ -564,14 +564,14 @@ point_estimate</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##    stat
 ##   &lt;dbl&gt;
-## 1  40.8</code></pre>
+## 1  41.4</code></pre>
 <pre class="r"><code># generate a null distribution
 null_dist &lt;- gss %&gt;%
   specify(response = hours) %&gt;%
   hypothesize(null = &quot;point&quot;, mu = 40) %&gt;%
   generate(reps = 10000, type = &quot;bootstrap&quot;) %&gt;%
   calculate(stat = &quot;mean&quot;)</code></pre>
-<p>Our point estimate 40.7722096 seems <em>pretty</em> close to 40, but a little bit different. We might wonder if this difference is just due to random chance, or if the mean number of hours worked per week in the population really isn’t 40.</p>
+<p>Our point estimate 41.382 seems <em>pretty</em> close to 40, but a little bit different. We might wonder if this difference is just due to random chance, or if the mean number of hours worked per week in the population really isn’t 40.</p>
 </div>
 <div id="section-visualizing" class="section level3">
 <h3>Visualizing</h3>
@@ -588,7 +588,7 @@ null_dist &lt;- gss %&gt;%
 </div>
 <div id="section-p-values-and-confidence-intervals" class="section level3">
 <h3>p-Values and Confidence Intervals</h3>
-<p>The red bar from that last visualization looks like it’s pretty far out on the right tail of the null distribution, so observing a sample mean of 40.7722096 hours would be pretty unlikely if the mean was actually 40 hours. How unlikely, though?</p>
+<p>The red bar from that last visualization looks like it’s pretty far out on the right tail of the null distribution, so observing a sample mean of 41.382 hours would be pretty unlikely if the mean was actually 40 hours. How unlikely, though?</p>
 <pre class="r"><code># get a two-tailed p-value
 p_value &lt;- null_dist %&gt;%
   get_p_value(obs_stat = point_estimate, direction = &quot;two_sided&quot;)
@@ -597,8 +597,8 @@ p_value</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   p_value
 ##     &lt;dbl&gt;
-## 1  0.0224</code></pre>
-<p>It looks like the p-value is 0.0224, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (0.7722096 hours) from 40 would be 0.0224. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
+## 1  0.0396</code></pre>
+<p>It looks like the p-value is 0.0396, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (1.382 hours) from 40 would be 0.0396. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
 <p>To get a confidence interval around our estimate, we can write:</p>
 <pre class="r"><code># start with the null distribution
 null_dist %&gt;%
@@ -611,7 +611,7 @@ null_dist %&gt;%
 <pre><code>## # A tibble: 1 x 2
 ##   lower upper
 ##   &lt;dbl&gt; &lt;dbl&gt;
-## 1  40.1  41.4</code></pre>
+## 1  40.1  42.7</code></pre>
 <p>As you can see, 40 hours per week is not contained in this interval, which aligns with our previous conclusion that this finding is significant at the confidence level <span class="math inline">\(\alpha = .05\)</span>.</p>
 </div>
 <div id="section-exercise-4" class="section level3">
@@ -782,7 +782,7 @@ if (!requireNamespace("gradethis", quietly = TRUE)) {
 
 library(learnr)
 library(gradethis)
-devtools::load_all()
+library(infer)
 tutorial_options(exercise.timelimit = 60,
                  exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(rows.print=5)
@@ -896,7 +896,7 @@ output$`tutorial-exercise-ch-viz-output` <- renderUI({
 <!--/html_preserve-->
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","callr","cli","colorspace","compiler","crayon","datasets","desc","devtools","digest","dplyr","ellipsis","evaluate","fansi","farver","fastmap","fs","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","htmltools","htmlwidgets","httpuv","infer","jsonlite","knitr","labeling","later","lazyeval","learnr","lifecycle","magrittr","markdown","memoise","methods","mime","munsell","pillar","pkgbuild","pkgconfig","pkgload","prettyunits","processx","promises","ps","purrr","R6","Rcpp","remotes","rlang","rmarkdown","rprojroot","rstudioapi","scales","sessioninfo","shiny","stats","stringi","stringr","testthat","tibble","tidyselect","tools","usethis","utf8","utils","vctrs","withr","xfun","xtable","yaml","zeallot"]},{"type":"character","attributes":{},"value":["0.2.1","1.1.5","3.6.1","3.4.0","2.0.0","1.4-1","3.6.1","1.3.4","3.6.1","1.2.0","2.2.1","0.6.23","0.8.3","0.3.0","0.14","0.4.0","2.0.1","1.0.1","1.3.1","3.2.1","1.3.1","0.1.0.9002","3.6.1","3.6.1","3.6.1","0.3.0","0.4.0","1.5.1","1.5.2","0.5.1.9000","1.6","1.25","0.3","1.0.0","0.2.2","0.10.0","0.1.0","1.5","1.1","1.1.0","3.6.1","0.8","0.5.0","1.4.3","1.0.6","2.0.3","1.0.2","1.0.2","3.4.1","1.1.0","1.3.0","0.3.3","2.4.1","1.0.3","2.1.0","0.4.2","1.15","1.3-2","0.10","1.1.0","1.1.1","1.4.0","3.6.1","1.4.3","1.4.0","2.3.1","2.1.3","0.2.5","3.6.1","1.5.1","1.1.4","3.6.1","0.2.1","2.1.2","0.10","1.8-4","2.2.0","0.1.0"]}]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61]}},"value":[{"type":"character","attributes":{},"value":["assertthat","backports","base","cli","colorspace","compiler","crayon","datasets","digest","dplyr","evaluate","fansi","farver","fastmap","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","htmltools","htmlwidgets","httpuv","infer","jsonlite","knitr","labeling","later","lazyeval","learnr","lifecycle","magrittr","markdown","methods","mime","munsell","pillar","pkgconfig","promises","purrr","R6","Rcpp","rlang","rmarkdown","rprojroot","scales","shiny","stats","stringi","stringr","tibble","tidyselect","tools","utf8","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["0.2.1","1.1.5","3.6.1","2.0.1","1.4-1","3.6.1","1.3.4","3.6.1","0.6.23","0.8.4","0.14","0.4.1","2.0.3","1.0.1","3.2.1","1.3.1","0.1.0.9002","3.6.1","3.6.1","3.6.1","0.3.0","0.4.0","1.5.1","1.5.2","0.5.1.9000","1.6","1.25","0.3","1.0.0","0.2.2","0.10.0","0.1.0","1.5","1.1","3.6.1","0.8","0.5.0","1.4.3","2.0.3","1.1.0","0.3.3","2.4.1","1.0.3","0.4.4","1.15","1.3-2","1.1.0","1.4.0","3.6.1","1.4.5","1.4.0","2.1.3","1.0.0","3.6.1","1.1.4","3.6.1","0.2.2","2.1.2","0.10","1.8-4","2.2.0"]}]}]}
 </script>
 <!--/html_preserve-->
 </div>
