@@ -1,0 +1,12 @@
+name: infer
+title: infer
+username:
+account: simonpcouch
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1750313
+bundleId: 2770600
+url: https://simonpcouch.shinyapps.io/infer/
+when: 1580707993.32583
+asMultiple: FALSE
+asStatic: FALSE

@@ -122,7 +122,7 @@ $(document).ready(function () {
 <p>This tutorial assumes some background with hypothesis testing and base R. To read about the intuition behind hypothesis testing and the design of this package, see the <em>Introduction</em> section of <code>vignette(&quot;infer&quot;)</code>.</p>
 <div id="section-the-gss-dataset" class="section level3">
 <h3>The <code>gss</code> Dataset</h3>
-<p>Throughout this tutorial, we’ll make use of the <code>gss</code> dataset supplied by <code>infer</code>, containing a sample of 3000 observations of 11 variables from the <em>General Social Survey</em>. Print the <code>gss</code> dataset to check it out!</p>
+<p>Throughout this tutorial, we’ll make use of the <code>gss</code> dataset supplied by <code>infer</code>, containing a sample of 500 observations of 11 variables from the <em>General Social Survey</em>. Print the <code>gss</code> dataset to check it out!</p>
 <div class="tutorial-exercise" data-label="gss" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code># check out the `gss` dataset</code></pre>
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":true,"error":false,"message":true,"exercise.df_print":"default","exercise.timelimit":60,"exercise.checker":["function (label = NULL, solution_code = NULL, user_code = NULL, ","    check_code = NULL, envir_result = NULL, evaluate_result = NULL, ","    envir_prep = NULL, last_value = NULL, ...) ","{","    if (is.null(user_code)) {","        return(list(message = \"I didn't receive your code. Did you write any?\", ","            correct = FALSE, type = \"error\", location = \"append\"))","    }","    else {","        user_code <- parse(text = user_code)","        if (length(user_code) == 0) {","            return(list(message = \"I didn't receive your code. Did you write any?\", ","                correct = FALSE, type = \"error\", location = \"append\"))","        }","    }","    if (!is.null(solution_code)) {","        solution_code <- parse(text = solution_code)","        if (length(solution_code) == 0) {","            return(list(message = \"No solution is provided for this exercise.\", ","                correct = TRUE, type = \"info\", location = \"append\"))","        }","    }","    had_error_checking <- FALSE","    checked_result <- tryCatch({","        parsed_check_code <- parse(text = check_code)","        if (length(parsed_check_code) > 1) {","            for (i in 1:(length(parsed_check_code) - 1)) {","                eval(parsed_check_code[[i]], envir_prep)","            }","        }","        grading_code <- rlang::call_standardise(parsed_check_code[[length(parsed_check_code)]], ","            envir_prep)","        grader_args <- list(user_quo = rlang::as_quosure(user_code[[length(user_code)]], ","            envir_result))","        if (!is.null(solution_code)) {","            grader_args$solution_quo <- rlang::as_quosure(solution_code[[length(solution_code)]], ","                envir_prep)","        }","        learnr_args <- list(...)","        learnr_args$label <- label","        learnr_args$solution_code <- solution_code","        learnr_args$user_code <- user_code","        learnr_args$check_code <- check_code","        learnr_args$envir_result <- envir_result","        learnr_args$evaluate_result <- evaluate_result","        learnr_args$envir_prep <- envir_prep","        learnr_args$last_value <- last_value","        grading_code$grader_args <- grader_args","        grading_code$learnr_args <- learnr_args","        envir_prep$ans <- grader_args$user","        eval(grading_code, envir_prep)","    }, error = function(e) {","        message(\"\", e)","        had_error_checking <<- TRUE","        graded(correct = FALSE, message = \"Error occured while checking the submission\")","    })","    if (!checkmate::test_class(checked_result, \"grader_graded\")) {","        stop(\"`grade_learnr` should receive a `graded` value from every `-check` chunk\")","    }","    message_type <- if (had_error_checking) {","        \"warning\"","    }","    else {","        if (checked_result$correct) {","            \"success\"","        }","        else {","            \"error\"","        }","    }","    ret <- list(message = checked_result$message, correct = checked_result$correct, ","        type = message_type, location = \"append\")","    ret","}"]}</script>
@@ -393,16 +393,16 @@ gss %&gt;%
 <pre><code>## # A tibble: 1,000 x 2
 ##    replicate  stat
 ##        &lt;int&gt; &lt;dbl&gt;
-##  1         1  39.8
-##  2         2  40.6
-##  3         3  39.8
-##  4         4  40.1
-##  5         5  39.7
-##  6         6  40.4
-##  7         7  39.6
-##  8         8  40.4
-##  9         9  39.6
-## 10        10  39.1
+##  1         1  39.3
+##  2         2  39.8
+##  3         3  41.1
+##  4         4  40.5
+##  5         5  38.9
+##  6         6  40.7
+##  7         7  39.9
+##  8         8  39.8
+##  9         9  39.2
+## 10        10  40.6
 ## # … with 990 more rows</code></pre>
 <p>The output of <code>calculate()</code> here shows us the sample statistic (in this case, the mean) for each of our 1000 replicates.</p>
 <div id="section-exercise-2" class="section level3">
@@ -445,18 +445,18 @@ gss %&gt;%
   generate(reps = 1000, type = &quot;permute&quot;) %&gt;%
   calculate(&quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))</code></pre>
 <pre><code>## # A tibble: 1,000 x 2
-##    replicate    stat
-##        &lt;int&gt;   &lt;dbl&gt;
-##  1         1  2.08  
-##  2         2 -1.69  
-##  3         3 -0.0113
-##  4         4  0.368 
-##  5         5  1.80  
-##  6         6 -3.14  
-##  7         7 -0.531 
-##  8         8 -2.05  
-##  9         9 -2.53  
-## 10        10 -1.37  
+##    replicate   stat
+##        &lt;int&gt;  &lt;dbl&gt;
+##  1         1  0.518
+##  2         2 -1.24 
+##  3         3 -1.11 
+##  4         4  1.28 
+##  5         5 -1.02 
+##  6         6 -0.787
+##  7         7  0.271
+##  8         8  1.41 
+##  9         9  1.17 
+## 10        10  1.77 
 ## # … with 990 more rows</code></pre>
 </div>
 <div id="section-exercise-3" class="section level3">
@@ -597,8 +597,8 @@ p_value</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   p_value
 ##     &lt;dbl&gt;
-## 1  0.0396</code></pre>
-<p>It looks like the p-value is 0.0396, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (1.382 hours) from 40 would be 0.0396. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
+## 1  0.0364</code></pre>
+<p>It looks like the p-value is 0.0364, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (1.382 hours) from 40 would be 0.0364. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
 <p>To get a confidence interval around our estimate, we can write:</p>
 <pre class="r"><code># start with the null distribution
 null_dist %&gt;%

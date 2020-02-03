@@ -38,7 +38,7 @@ This tutorial assumes some background with hypothesis testing and base R. To rea
 
 ### The `gss` Dataset
 
-Throughout this tutorial, we'll make use of the `gss` dataset supplied by `infer`, containing a sample of 3000 observations of 11 variables from the *General Social Survey*. Print the `gss` dataset to check it out!
+Throughout this tutorial, we'll make use of the `gss` dataset supplied by `infer`, containing a sample of 500 observations of 11 variables from the *General Social Survey*. Print the `gss` dataset to check it out!
 
 ```{r gss, exercise = TRUE}
 # check out the `gss` dataset
