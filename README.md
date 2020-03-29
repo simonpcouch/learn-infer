@@ -13,7 +13,7 @@ install those packages with the following code:
 install.packages("infer")
 install.packages("learnr")
 
-# gradethis isn't on GitHub, so install it
+# gradethis isn't on CRAN, so install it
 # using the devtools package!
 # install.packages("devtools")
 devtools::install_github("rstudio-education/gradethis")
