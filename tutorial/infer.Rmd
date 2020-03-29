@@ -28,6 +28,7 @@ library(infer)
 tutorial_options(exercise.timelimit = 60,
                  exercise.checker = gradethis::grade_learnr)
 knitr::opts_chunk$set(rows.print=5)
+
 ```
 
 ## Welcome
@@ -595,7 +596,7 @@ null_dist <- gss %>%
   calculate(stat = "diff in means", order = c("degree", "no degree"))
 ```
 
-You have access to the `observed_statistic` and `null_dist` objects. Modify the following code to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two-sided"`.)
+You have access to the `observed_statistic` and `null_dist` objects. Modify the following code to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two_sided"`.)
 
 ```{r visualize, exercise = TRUE, warning = FALSE, message = FALSE}
 null_dist %>%
@@ -603,20 +604,20 @@ null_dist %>%
 ```
 
 ```{r visualize-hint-1}
-# Pipe the given code into a `shade_p_value()` call!
+# Add the visualize() layer to a `shade_p_value()` call!
 ```
 
 ```{r visualize-hint-2, eval = FALSE}
 # Type: 
 null_dist %>%
-  visualize() %>%
+  visualize() +
   shade_p_value(obs_stat = observed_statistic, direction = "two_sided")
 # and then click the Submit Answer button.
 ```
 
 ```{r visualize-solution}
 null_dist %>%
-  visualize() %>%
+  visualize() +
   shade_p_value(obs_stat = observed_statistic, direction = "two_sided")
 ```
 
@@ -641,7 +642,7 @@ To start off, use `gss` and functions from `infer` to find the observed differen
 ```
 
 ```{r ch1-hint-2, eval = FALSE}
-# Here's the first two lines:
+# Here are the first two lines:
 gss %>%
   specify(age ~ college)
 # See if you can write the last one!
