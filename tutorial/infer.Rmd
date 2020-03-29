@@ -584,7 +584,7 @@ As you can see, 40 hours per week is not contained in this interval, which align
 
 The following code calculates an observed $t$ statistic for the distribution 
 
-```{r, warning = FALSE, message = FALSE}
+```{r visualize-setup, warning = FALSE, message = FALSE}
 observed_statistic <- gss %>%
   specify(hours ~ college) %>%
   calculate(stat = "diff in means", order = c("degree", "no degree"))
@@ -690,14 +690,14 @@ You have access to the observed difference you calculated in the last problem, s
 ```
 
 ```{r ch-null-hint-2, eval = FALSE}
-# Here's the first two lines:
+# Here are the first two lines:
 gss %>%
   specify(age ~ college)
 # See if you can write the next three!
 ```
 
 ```{r ch-null-hint-3, eval = FALSE}
-# Here's the first three lines:
+# Here are the first three lines:
 gss %>%
   specify(age ~ college) %>%
   hypothesize(null = "independence")
@@ -728,30 +728,41 @@ gradethis::grade_code(correct = paste0(gradethis::random_praise()))
 
 ### Generate a Null Distribution
 
-You have access to the observed difference and null distribution you calculated in the last problems, stored as `observed_diff` and `null_dist`. Now, use `gss` and functions from `infer` to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two-sided"`.)
+You have access to the observed difference and null distribution you calculated in the last problems, stored as `observed_diff` and `null_dist`. Now, use `gss` and functions from `infer` to visualize where the observed statistic lies on the null distribution (with `direction` set to `"two_sided"`.)
 
+```{r chviz-setup, warning = FALSE, message = FALSE}
+observed_diff <- gss %>%
+  specify(age ~ college) %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
 
-```{r ch-viz, exercise = TRUE, warning = FALSE, message = FALSE}
+null_dist <- gss %>%
+  specify(age ~ college) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("degree", "no degree"))
+```
+
+```{r chviz, exercise = TRUE, warning = FALSE, message = FALSE}
 
 ```
 
-```{r ch-viz-hint-1}
+```{r chviz-hint-1}
 # Use visualize() and shade_p_value!
 ```
 
-```{r ch-viz-hint-2, eval = FALSE}
+```{r chviz-hint-2, eval = FALSE}
 # Have you made sure to add the shade_p_value() layer with
 # `+` rather than piping the visualize() layer with `%>%`?
 ```
 
-```{r ch-viz-hint-3, eval = FALSE}
-# Here's the first two lines
+```{r chviz-hint-3, eval = FALSE}
+# Here are the first two lines:
 null_dist %>%
   visualize()
 # See if you can write the last one!
 ```
 
-```{r ch-viz-hint-4, eval = FALSE}
+```{r chviz-hint-4, eval = FALSE}
 # Type: 
 null_dist %>%
   visualize() +
@@ -759,13 +770,13 @@ null_dist %>%
 # and then click the Submit Answer button.
 ```
 
-```{r ch-viz-solution, warning = FALSE, message = FALSE}
+```{r chviz-solution, warning = FALSE, message = FALSE}
 null_dist %>%
   visualize() +
   shade_p_value(obs_stat = observed_diff, direction = "two_sided")
 ```
 
-```{r ch-viz-check}
+```{r chviz-check}
 gradethis::grade_code(correct = paste0(gradethis::random_praise(),
     " That's it! You've got `infer` down. Congrats on making it all of the",
     " way through this tutorial! Many of the examples provided",

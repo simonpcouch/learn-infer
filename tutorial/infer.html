@@ -393,16 +393,16 @@ gss %&gt;%
 <pre><code>## # A tibble: 1,000 x 2
 ##    replicate  stat
 ##        &lt;int&gt; &lt;dbl&gt;
-##  1         1  39.1
-##  2         2  39.5
-##  3         3  40.1
-##  4         4  39.2
-##  5         5  40.2
-##  6         6  39.9
+##  1         1  41.6
+##  2         2  39.2
+##  3         3  40.3
+##  4         4  39.9
+##  5         5  40.1
+##  6         6  39.1
 ##  7         7  39.8
-##  8         8  39.4
-##  9         9  40.1
-## 10        10  40.3
+##  8         8  39.2
+##  9         9  41.2
+## 10        10  39.5
 ## # … with 990 more rows</code></pre>
 <p>The output of <code>calculate()</code> here shows us the sample statistic (in this case, the mean) for each of our 1000 replicates.</p>
 <div id="section-exercise-2" class="section level3">
@@ -445,18 +445,18 @@ gss %&gt;%
   generate(reps = 1000, type = &quot;permute&quot;) %&gt;%
   calculate(&quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))</code></pre>
 <pre><code>## # A tibble: 1,000 x 2
-##    replicate    stat
-##        &lt;int&gt;   &lt;dbl&gt;
-##  1         1 -2.14  
-##  2         2  0.209 
-##  3         3  0.0945
-##  4         4 -1.42  
-##  5         5  2.42  
-##  6         6 -1.40  
-##  7         7  0.0945
-##  8         8 -1.90  
-##  9         9  0.235 
-## 10        10 -1.11  
+##    replicate   stat
+##        &lt;int&gt;  &lt;dbl&gt;
+##  1         1 -1.42 
+##  2         2 -2.28 
+##  3         3  0.544
+##  4         4 -0.179
+##  5         5  0.879
+##  6         6  0.385
+##  7         7 -1.10 
+##  8         8 -0.981
+##  9         9  1.48 
+## 10        10 -1.12 
 ## # … with 990 more rows</code></pre>
 </div>
 <div id="section-exercise-3" class="section level3">
@@ -597,8 +597,8 @@ p_value</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   p_value
 ##     &lt;dbl&gt;
-## 1   0.038</code></pre>
-<p>It looks like the p-value is 0.038, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (1.382 hours) from 40 would be 0.038. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
+## 1   0.042</code></pre>
+<p>It looks like the p-value is 0.042, which is pretty small—if the true mean number of hours worked per week was actually 40, the probability of our sample mean being this far (1.382 hours) from 40 would be 0.042. This may or may not be statistically significantly different, depending on the significance level <span class="math inline">\(\alpha\)</span> you decided on <em>before</em> you ran this analysis. If you had set <span class="math inline">\(\alpha = .05\)</span>, then this difference would be statistically significant, but if you had set <span class="math inline">\(\alpha = .01\)</span>, then it would not be.</p>
 <p>To get a confidence interval around our estimate, we can write:</p>
 <pre class="r"><code># start with the null distribution
 null_dist %&gt;%
@@ -617,7 +617,8 @@ null_dist %&gt;%
 <div id="section-exercise-4" class="section level3">
 <h3>Exercise</h3>
 <p>The following code calculates an observed <span class="math inline">\(t\)</span> statistic for the distribution</p>
-<pre class="r"><code>observed_statistic &lt;- gss %&gt;%
+<div class="tutorial-exercise-support" data-label="visualize-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>observed_statistic &lt;- gss %&gt;%
   specify(hours ~ college) %&gt;%
   calculate(stat = &quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))
 
@@ -626,6 +627,7 @@ null_dist &lt;- gss %&gt;%
   hypothesize(null = &quot;independence&quot;) %&gt;%
   generate(reps = 1000, type = &quot;permute&quot;) %&gt;%
   calculate(stat = &quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))</code></pre>
+</div>
 <p>You have access to the <code>observed_statistic</code> and <code>null_dist</code> objects. Modify the following code to visualize where the observed statistic lies on the null distribution (with <code>direction</code> set to <code>&quot;two_sided&quot;</code>.)</p>
 <div class="tutorial-exercise" data-label="visualize" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>null_dist %&gt;%
@@ -695,13 +697,13 @@ gss %&gt;%
 <pre class="text"><code># Use all of the 4 main verbs!</code></pre>
 </div>
 <div class="tutorial-exercise-support" data-label="ch-null-hint-2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Here&#39;s the first two lines:
+<pre class="text"><code># Here are the first two lines:
 gss %&gt;%
   specify(age ~ college)
 # See if you can write the next three!</code></pre>
 </div>
 <div class="tutorial-exercise-support" data-label="ch-null-hint-3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Here&#39;s the first three lines:
+<pre class="text"><code># Here are the first three lines:
 gss %&gt;%
   specify(age ~ college) %&gt;%
   hypothesize(null = &quot;independence&quot;)
@@ -729,36 +731,47 @@ gss %&gt;%
 </div>
 <div id="section-generate-a-null-distribution-1" class="section level3">
 <h3>Generate a Null Distribution</h3>
-<p>You have access to the observed difference and null distribution you calculated in the last problems, stored as <code>observed_diff</code> and <code>null_dist</code>. Now, use <code>gss</code> and functions from <code>infer</code> to visualize where the observed statistic lies on the null distribution (with <code>direction</code> set to <code>&quot;two-sided&quot;</code>.)</p>
-<div class="tutorial-exercise" data-label="ch-viz" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<p>You have access to the observed difference and null distribution you calculated in the last problems, stored as <code>observed_diff</code> and <code>null_dist</code>. Now, use <code>gss</code> and functions from <code>infer</code> to visualize where the observed statistic lies on the null distribution (with <code>direction</code> set to <code>&quot;two_sided&quot;</code>.)</p>
+<div class="tutorial-exercise-support" data-label="chviz-setup" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code>observed_diff &lt;- gss %&gt;%
+  specify(age ~ college) %&gt;%
+  calculate(stat = &quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))
+
+null_dist &lt;- gss %&gt;%
+  specify(age ~ college) %&gt;%
+  hypothesize(null = &quot;independence&quot;) %&gt;%
+  generate(reps = 1000, type = &quot;permute&quot;) %&gt;%
+  calculate(stat = &quot;diff in means&quot;, order = c(&quot;degree&quot;, &quot;no degree&quot;))</code></pre>
+</div>
+<div class="tutorial-exercise" data-label="chviz" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <script type="application/json" data-opts-chunk="1">{"fig.width":6.5,"fig.height":4,"fig.retina":2,"fig.align":"default","fig.keep":"high","fig.show":"asis","out.width":624,"warning":false,"error":false,"message":false,"exercise.df_print":"default","exercise.timelimit":60,"exercise.checker":["function (label = NULL, solution_code = NULL, user_code = NULL, ","    check_code = NULL, envir_result = NULL, evaluate_result = NULL, ","    envir_prep = NULL, last_value = NULL, ...) ","{","    if (is.null(user_code)) {","        return(list(message = \"I didn't receive your code. Did you write any?\", ","            correct = FALSE, type = \"error\", location = \"append\"))","    }","    else {","        user_code <- parse(text = user_code)","        if (length(user_code) == 0) {","            return(list(message = \"I didn't receive your code. Did you write any?\", ","                correct = FALSE, type = \"error\", location = \"append\"))","        }","    }","    if (!is.null(solution_code)) {","        solution_code <- parse(text = solution_code)","        if (length(solution_code) == 0) {","            return(list(message = \"No solution is provided for this exercise.\", ","                correct = TRUE, type = \"info\", location = \"append\"))","        }","    }","    had_error_checking <- FALSE","    checked_result <- tryCatch({","        parsed_check_code <- parse(text = check_code)","        if (length(parsed_check_code) > 1) {","            for (i in 1:(length(parsed_check_code) - 1)) {","                eval(parsed_check_code[[i]], envir_prep)","            }","        }","        grading_code <- rlang::call_standardise(parsed_check_code[[length(parsed_check_code)]], ","            envir_prep)","        grader_args <- list(user_quo = rlang::as_quosure(user_code[[length(user_code)]], ","            envir_result))","        if (!is.null(solution_code)) {","            grader_args$solution_quo <- rlang::as_quosure(solution_code[[length(solution_code)]], ","                envir_prep)","        }","        learnr_args <- list(...)","        learnr_args$label <- label","        learnr_args$solution_code <- solution_code","        learnr_args$user_code <- user_code","        learnr_args$check_code <- check_code","        learnr_args$envir_result <- envir_result","        learnr_args$evaluate_result <- evaluate_result","        learnr_args$envir_prep <- envir_prep","        learnr_args$last_value <- last_value","        grading_code$grader_args <- grader_args","        grading_code$learnr_args <- learnr_args","        envir_prep$ans <- grader_args$user","        eval(grading_code, envir_prep)","    }, error = function(e) {","        message(\"\", e)","        had_error_checking <<- TRUE","        graded(correct = FALSE, message = \"Error occured while checking the submission\")","    })","    if (!checkmate::test_class(checked_result, \"grader_graded\")) {","        stop(\"`grade_learnr` should receive a `graded` value from every `-check` chunk\")","    }","    message_type <- if (had_error_checking) {","        \"warning\"","    }","    else {","        if (checked_result$correct) {","            \"success\"","        }","        else {","            \"error\"","        }","    }","    ret <- list(message = checked_result$message, correct = checked_result$correct, ","        type = message_type, location = \"append\")","    ret","}"]}</script>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise-support" data-label="chviz-hint-1" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code># Use visualize() and shade_p_value!</code></pre>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-hint-2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise-support" data-label="chviz-hint-2" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code># Have you made sure to add the shade_p_value() layer with
 # `+` rather than piping the visualize() layer with `%&gt;%`?</code></pre>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-hint-3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
-<pre class="text"><code># Here&#39;s the first two lines
+<div class="tutorial-exercise-support" data-label="chviz-hint-3" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<pre class="text"><code># Here are the first two lines:
 null_dist %&gt;%
   visualize()
 # See if you can write the last one!</code></pre>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-hint-4" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise-support" data-label="chviz-hint-4" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code># Type: 
 null_dist %&gt;%
   visualize() +
   shade_p_value(obs_stat = observed_diff, direction = &quot;two_sided&quot;)
 # and then click the Submit Answer button.</code></pre>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise-support" data-label="chviz-solution" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>null_dist %&gt;%
   visualize() +
   shade_p_value(obs_stat = observed_diff, direction = &quot;two_sided&quot;)</code></pre>
 </div>
-<div class="tutorial-exercise-support" data-label="ch-viz-check" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
+<div class="tutorial-exercise-support" data-label="chviz-check" data-caption="Code" data-completion="1" data-diagnostics="1" data-startover="1" data-lines="0">
 <pre class="text"><code>gradethis::grade_code(correct = paste0(gradethis::random_praise(),
     &quot; That&#39;s it! You&#39;ve got `infer` down. Congrats on making it all of the&quot;,
     &quot; way through this tutorial! Many of the examples provided&quot;,
@@ -885,9 +898,9 @@ output$`tutorial-exercise-ch-null-output` <- renderUI({
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-`tutorial-exercise-ch-viz-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ch-viz-code-editor`)), session)
-output$`tutorial-exercise-ch-viz-output` <- renderUI({
-  `tutorial-exercise-ch-viz-result`()
+`tutorial-exercise-chviz-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-chviz-code-editor`)), session)
+output$`tutorial-exercise-chviz-output` <- renderUI({
+  `tutorial-exercise-chviz-result`()
 })
 </script>
  <!--html_preserve-->
